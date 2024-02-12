@@ -46,6 +46,7 @@ class Newsletters(Resource):
 
         return response
 
+    
     def post(self):
         
         new_record = Newsletter(
@@ -64,6 +65,9 @@ class Newsletters(Resource):
         )
 
         return response
+    
+
+
 
 api.add_resource(Newsletters, '/newsletters')
 
@@ -79,6 +83,38 @@ class NewsletterByID(Resource):
         )
 
         return response
+    
+    def patch(self, id):
+
+            record = Newsletter.query.filter(Newsletter.id == id).first()
+            for attr in request.form:
+                setattr(record, attr, request.form[attr])
+
+            db.session.add(record)
+            db.session.commit()
+
+            response_dict = record.to_dict()
+
+            response = make_response(
+                response_dict,
+                200
+            )
+
+            return response
+    
+    def delete(self, id):
+
+        record = Newsletter.query.filter_by(id=id).first()
+
+        db.session.delete(record)
+        db.session.commit()
+
+        response_dict = {"message": "record deleted"}
+
+        response = make_response(response_dict, 200)
+
+        return response
+        
 
 api.add_resource(NewsletterByID, '/newsletters/<int:id>')
 
